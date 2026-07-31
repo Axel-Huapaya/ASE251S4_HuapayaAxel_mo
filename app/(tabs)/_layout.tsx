@@ -1,33 +1,61 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs, router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Alert } from "react-native";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+const VERDE_OSCURO = "#1B4332";
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarActiveTintColor: VERDE_OSCURO,
+        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarStyle: {
+          height: 56 + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
+          paddingTop: 6,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Inicio",
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="cultivos"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Cultivos",
+          tabBarIcon: ({ color, size }) => <Ionicons name="leaf" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="parcelas"
+        options={{
+          title: "Parcelas",
+          tabBarIcon: ({ color, size }) => <Ionicons name="map" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="logout"
+        options={{
+          title: "Salir",
+          tabBarIcon: ({ color, size }) => <Ionicons name="log-out" color={color} size={size} />,
+        }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            Alert.alert("Cerrar sesión", "¿Seguro que deseas salir?", [
+              { text: "Cancelar", style: "cancel" },
+              { text: "Salir", style: "destructive", onPress: () => router.replace("/login") },
+            ]);
+          },
         }}
       />
     </Tabs>
