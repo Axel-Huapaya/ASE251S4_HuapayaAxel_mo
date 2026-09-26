@@ -1,94 +1,84 @@
 # AgroPacayales Mobile
 
-Aplicación móvil del proyecto **Agro Pacayales S.A.C.** (Equipo 5, ASE251S4 – Sprint 7) para la gestión agrícola: acceso de usuarios, panel de inicio, **CRUD maestro de Parcelas** y gestión de Cultivos.
+Aplicación móvil del proyecto **Agro Pacayales S.A.C.** para la gestión agrícola: autenticación, panel de inicio con métricas en tiempo real, **CRUD maestro de Usuarios**, **CRUD maestro de Parcelas** y **CRUD de Cultivos**.
 
 - **Estudiante:** Huapaya Huari, Axel Victor
 - **Unidad didáctica:** DAM – Desarrollo de Aplicaciones Móviles
 - **Repositorio individual:** `ASE251S4_HuapayaHuariAxelVictor_mo` (rama `develop`)
-- **Repositorio grupal:** `ASE251S4_T05_mo` (rama `develop`)
 
-## Tecnologías
+---
+
+## 🛠️ Tecnologías
 
 | Componente | Tecnología | Versión |
 |---|---|---|
-| Plataforma | Expo SDK | ~54.0.35 |
-| Interfaz móvil | React Native | 0.81.5 |
-| Lenguaje | TypeScript / React | ~5.9.2 / 19.1.0 |
-| Navegación | Expo Router + React Navigation (bottom-tabs) | ~6.0.24 / ^7.x |
-| Sesión local | AsyncStorage | 2.2.0 |
-| Exportación | expo-print, expo-sharing, expo-file-system | ~15.0.8 / ~14.0.8 / ~19.0.23 |
+| Plataforma | Expo SDK | `~54.0.35` |
+| Interfaz móvil | React Native | `0.81.5` |
+| Lenguaje | TypeScript / React | `~5.9.2` / `19.1.0` |
+| Navegación | Expo Router + React Navigation | `~6.0.24` / `^7.x` |
+| Sesión local | AsyncStorage | `2.2.0` |
+| Exportación | expo-print, expo-sharing, expo-file-system | `~15.0.8` / `~14.0.8` / `~19.0.23` |
 
-## Funcionalidades
+---
 
-- **Login:** validación de campos, mensajes de error (credenciales inválidas / sin conexión) y sesión guardada localmente.
-- **Inicio:** fecha del día, totales de cultivos, parcelas y usuarios, y accesos a los módulos.
-- **Parcelas (CRUD maestro):** listar, registrar, editar, eliminación lógica, restauración, filtro activos/inactivos y exportación a PDF y Excel (CSV).
-- **Cultivos:** CRUD dependiente de la parcela asociada, con eliminación lógica y restauración.
-- **Cerrar sesión** con confirmación; borra la sesión guardada.
+## ✨ Funcionalidades
 
-## Estructura del proyecto
+- **🔐 Login:** Validación de credenciales en tiempo real (`POST /api/auth/login`), mensajes descriptivos de error y persistencia de sesión en almacenamiento local.
+- **📊 Inicio (Dashboard):** Fecha en formato largo, indicadores en tiempo real (totales de Cultivos, Parcelas y Usuarios) y resiliencia con `Promise.allSettled()`.
+- **👥 Usuarios (CRUD Maestro):** Listar, registrar, editar, desactivar y restaurar usuarios. Incluye filtro por estado (Activos/Inactivos) y búsqueda instantánea por nombre, correo o rol.
+- **🌱 Parcelas (CRUD Maestro):** Listar, registrar, editar, eliminación y restauración lógica, filtros y exportación a formatos PDF y CSV (Excel).
+- **🌿 Cultivos:** CRUD reactivo vinculado a parcelas operativas, con eliminación lógica y restauración.
+- **🚪 Cerrar Sesión:** Modal de confirmación con limpieza de credenciales locales.
 
-Organizada por capas, según la estructura definida para el Proyecto Móvil del 4.º semestre.
+---
 
-```
-app/                        # Expo Router: cada archivo = una pantalla
+## 📁 Estructura del Proyecto
+
+Organizada por capas según las buenas prácticas de arquitectura React Native / Expo:
+
+```text
+app/                        # Expo Router (Rutas y Pantallas)
 ├── (tabs)/
-│   ├── _layout.tsx         # Pestañas: iconos, títulos, cierre de sesión
-│   ├── index.tsx           # Inicio
-│   ├── cultivos.tsx        # Gestión de cultivos
-│   ├── parcelas.tsx        # CRUD maestro de parcelas
-│   └── logout.tsx          # Pestaña que dispara el cierre de sesión
-├── _layout.tsx             # Layout raíz: Stack + proveedores (tema y sesión)
-└── login.tsx               # Pantalla pública
+│   ├── _layout.tsx         # Pestañas inferiores (Inicio, Cultivos, Parcelas, Usuarios, Salir)
+│   ├── index.tsx           # Dashboard de Inicio
+│   ├── cultivos.tsx        # Gestión de Cultivos
+│   ├── parcelas.tsx        # CRUD Maestro de Parcelas
+│   ├── usuarios.tsx        # CRUD Maestro de Usuarios
+│   └── logout.tsx          # Confirmación de salida
+├── _layout.tsx             # Layout raíz (Stack y proveedores de contexto)
+└── login.tsx               # Pantalla de inicio de sesión
 components/
-├── common/                 # Reutilizables globales
-│   ├── app-button.tsx  app-input.tsx  app-header.tsx  screen-container.tsx
-│   └── index.ts
-└── ui/                     # Visuales específicos (tarjetas, modal de formulario, filtros)
-constants/                  # colors.ts · config.ts (BASE_URL, timeout, claves) · theme.ts
-hooks/                      # use-auth · use-theme · use-parcelas · use-cultivos
-services/                   # Llamadas HTTP y AsyncStorage: http · auth · parcela · cultivo · usuario · exportación
-store/                      # Estado global con Context: auth.store.tsx · theme.store.tsx
-types/                      # Interfaces TypeScript por entidad + index.ts
-utils/                      # storage.ts · validators.ts · formatters.ts
-assets/images/              # Íconos, logos y fondos
+├── common/                 # Componentes genéricos (AppButton, AppInput, AppHeader, ScreenContainer)
+└── ui/                     # Componentes visuales (EntityCard, EstadoBadge, EstadoToggle, FormModal, ListHeader, ModuleCard, StatCard)
+constants/                  # Configuración (colors.ts, config.ts, theme.ts)
+hooks/                      # Hooks personalizados (use-auth, use-usuarios, use-parcelas, use-cultivos)
+services/                   # Capa de consumo de API REST HTTP (auth, usuario, parcela, cultivo, exportación)
+types/                      # Interfaces TypeScript (auth, usuario, parcela, cultivo)
+utils/                      # Utilidades (validators.ts, formatters.ts, storage.ts)
 ```
 
-## Requisitos
+---
 
-- Node.js LTS y npm
-- App **Expo Go** (SDK 54) en el celular, o un emulador Android/iOS
-- Backend del proyecto encendido y accesible desde la red del dispositivo
+## 🚀 Requisitos e Instalación
 
-## Instalación y ejecución
+1. **Requisitos:** Node.js LTS, npm y la aplicación **Expo Go** (SDK 54) en un teléfono inteligente o emulador.
+2. **Instalación:**
+   ```bash
+   npm install
+   ```
+3. **Ejecución:**
+   ```bash
+   npx expo start
+   ```
 
-```bash
-npm install
-npx expo start
+---
+
+## 🌐 Configuración de la API Backend
+
+La dirección del backend se configura mediante variables de entorno en el archivo `.env.local`:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.50:8081
 ```
 
-Escanea el código QR con Expo Go o presiona `a` (Android) / `i` (iOS).
-
-## Configuración de la API
-
-La dirección del backend se define en un solo lugar: `constants/config.ts` (`BASE_URL`). Para cambiarla sin tocar el código, copia `.env.example` como `.env.local` y ajusta la IP:
-
-```
-EXPO_PUBLIC_API_URL=http://192.168.1.50
-```
-
-Reinicia con `npx expo start -c` para que Expo tome la variable.
-
-## API consumida (Parcelas)
-
-| Operación | Método y ruta |
-|---|---|
-| Listar | `GET /api/parcelas` |
-| Registrar | `POST /api/parcelas` |
-| Editar | `PUT /api/parcelas/{idParcela}` |
-| Eliminar (lógico) | `PATCH /api/parcelas/{idParcela}/eliminar` |
-| Restaurar | `PATCH /api/parcelas/{idParcela}/restaurar` |
-
-## Flujo de ramas
-
-`main` guarda versiones estables; el trabajo diario se integra en `develop`.
+*Reinicia el servidor de Expo con `npx expo start -c` para recargar la configuración.*
