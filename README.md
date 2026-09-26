@@ -1,50 +1,94 @@
-# Welcome to your Expo app 👋
+# AgroPacayales Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil del proyecto **Agro Pacayales S.A.C.** (Equipo 5, ASE251S4 – Sprint 7) para la gestión agrícola: acceso de usuarios, panel de inicio, **CRUD maestro de Parcelas** y gestión de Cultivos.
 
-## Get started
+- **Estudiante:** Huapaya Huari, Axel Victor
+- **Unidad didáctica:** DAM – Desarrollo de Aplicaciones Móviles
+- **Repositorio individual:** `ASE251S4_HuapayaHuariAxelVictor_mo` (rama `develop`)
+- **Repositorio grupal:** `ASE251S4_T05_mo` (rama `develop`)
 
-1. Install dependencies
+## Tecnologías
 
-   ```bash
-   npm install
-   ```
+| Componente | Tecnología | Versión |
+|---|---|---|
+| Plataforma | Expo SDK | ~54.0.35 |
+| Interfaz móvil | React Native | 0.81.5 |
+| Lenguaje | TypeScript / React | ~5.9.2 / 19.1.0 |
+| Navegación | Expo Router + React Navigation (bottom-tabs) | ~6.0.24 / ^7.x |
+| Sesión local | AsyncStorage | 2.2.0 |
+| Exportación | expo-print, expo-sharing, expo-file-system | ~15.0.8 / ~14.0.8 / ~19.0.23 |
 
-2. Start the app
+## Funcionalidades
 
-   ```bash
-   npx expo start
-   ```
+- **Login:** validación de campos, mensajes de error (credenciales inválidas / sin conexión) y sesión guardada localmente.
+- **Inicio:** fecha del día, totales de cultivos, parcelas y usuarios, y accesos a los módulos.
+- **Parcelas (CRUD maestro):** listar, registrar, editar, eliminación lógica, restauración, filtro activos/inactivos y exportación a PDF y Excel (CSV).
+- **Cultivos:** CRUD dependiente de la parcela asociada, con eliminación lógica y restauración.
+- **Cerrar sesión** con confirmación; borra la sesión guardada.
 
-In the output, you'll find options to open the app in a
+## Estructura del proyecto
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Organizada por capas, según la estructura definida para el Proyecto Móvil del 4.º semestre.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/                        # Expo Router: cada archivo = una pantalla
+├── (tabs)/
+│   ├── _layout.tsx         # Pestañas: iconos, títulos, cierre de sesión
+│   ├── index.tsx           # Inicio
+│   ├── cultivos.tsx        # Gestión de cultivos
+│   ├── parcelas.tsx        # CRUD maestro de parcelas
+│   └── logout.tsx          # Pestaña que dispara el cierre de sesión
+├── _layout.tsx             # Layout raíz: Stack + proveedores (tema y sesión)
+└── login.tsx               # Pantalla pública
+components/
+├── common/                 # Reutilizables globales
+│   ├── app-button.tsx  app-input.tsx  app-header.tsx  screen-container.tsx
+│   └── index.ts
+└── ui/                     # Visuales específicos (tarjetas, modal de formulario, filtros)
+constants/                  # colors.ts · config.ts (BASE_URL, timeout, claves) · theme.ts
+hooks/                      # use-auth · use-theme · use-parcelas · use-cultivos
+services/                   # Llamadas HTTP y AsyncStorage: http · auth · parcela · cultivo · usuario · exportación
+store/                      # Estado global con Context: auth.store.tsx · theme.store.tsx
+types/                      # Interfaces TypeScript por entidad + index.ts
+utils/                      # storage.ts · validators.ts · formatters.ts
+assets/images/              # Íconos, logos y fondos
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Requisitos
 
-## Learn more
+- Node.js LTS y npm
+- App **Expo Go** (SDK 54) en el celular, o un emulador Android/iOS
+- Backend del proyecto encendido y accesible desde la red del dispositivo
 
-To learn more about developing your project with Expo, look at the following resources:
+## Instalación y ejecución
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm install
+npx expo start
+```
 
-## Join the community
+Escanea el código QR con Expo Go o presiona `a` (Android) / `i` (iOS).
 
-Join our community of developers creating universal apps.
+## Configuración de la API
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+La dirección del backend se define en un solo lugar: `constants/config.ts` (`BASE_URL`). Para cambiarla sin tocar el código, copia `.env.example` como `.env.local` y ajusta la IP:
+
+```
+EXPO_PUBLIC_API_URL=http://192.168.1.50
+```
+
+Reinicia con `npx expo start -c` para que Expo tome la variable.
+
+## API consumida (Parcelas)
+
+| Operación | Método y ruta |
+|---|---|
+| Listar | `GET /api/parcelas` |
+| Registrar | `POST /api/parcelas` |
+| Editar | `PUT /api/parcelas/{idParcela}` |
+| Eliminar (lógico) | `PATCH /api/parcelas/{idParcela}/eliminar` |
+| Restaurar | `PATCH /api/parcelas/{idParcela}/restaurar` |
+
+## Flujo de ramas
+
+`main` guarda versiones estables; el trabajo diario se integra en `develop`.
